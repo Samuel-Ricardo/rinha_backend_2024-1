@@ -5,6 +5,12 @@ edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
+[profile.release]
+codegen-units = 1
+lto = true
+panic = "abort"
+
+
 [dependencies]
 serde = { version = "1.0.198", features = ["derive"] }
 time = { version = "0.3.36", features = [
