@@ -1,3 +1,4 @@
+workspace = { members = ["axum-unix-socket"] }
 [package]
 name = "rinha"
 version = "0.1.0"
