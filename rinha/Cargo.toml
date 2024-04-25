@@ -1,4 +1,4 @@
-workspace = { members = ["axum-tcp-socket", "load_balancer_tcp"] }
+workspace = { members = ["axum-tcp-socket", "load_balancer", "load_balancer_tcp"] }
 [package]
 name = "rinha"
 version = "0.1.0"
