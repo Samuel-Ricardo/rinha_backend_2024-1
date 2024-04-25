@@ -7,3 +7,4 @@ edition = "2021"
 
 [dependencies]
 axum = "0.7.5"
+hyper-util = { version = "0.1.3", features = ["client-legacy", "http2", "http1"] }
