@@ -10,9 +10,9 @@ use axum::extract::Request;
 
 use crate::model::LoadBalancer;
 
-struct RoundRobin {
-    addrs: Vec<String>,
-    req_counter: Arc<AtomicUsize>,
+pub struct RoundRobin {
+    pub addrs: Vec<String>,
+    pub req_counter: Arc<AtomicUsize>,
 }
 
 impl LoadBalancer for RoundRobin {

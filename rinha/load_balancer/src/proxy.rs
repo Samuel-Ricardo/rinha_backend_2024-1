@@ -11,7 +11,7 @@ use axum::{
 
 use crate::model::AppState;
 
-async fn main(
+pub async fn main(
     State(AppState {
         load_balancer,
         http_client,
