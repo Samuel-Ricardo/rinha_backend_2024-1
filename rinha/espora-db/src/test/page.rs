@@ -11,11 +11,25 @@ mod test {
     }
 
     #[test]
-    fn empty_bytes() {
+    fn initialize_with_empty_bytes() {
         let page = Page::<1024>::from_bytes(vec![]);
 
         assert_eq!(0, page.len());
         assert_eq!(PAGE_SIZE, page.available_space());
+    }
+
+    #[test]
+    fn initialize_from_bytes() {
+        let mut page = Page::<1024>::from_bytes(vec![]);
+
+        page.insert(1).unwrap();
+        page.insert(2).unwrap();
+
+        let new_page = Page::<1024>::from_bytes(page.as_ref().to_vec());
+
+        assert_eq!(page.len(), new_page.len());
+        assert_eq!(page.available_rows(), new_page.available_rows());
+        assert_eq!(page.available_space(), new_page.available_space());
     }
 
     #[test]
