@@ -1,5 +1,9 @@
-use std::io::Cursor;
+use std::io::{Cursor, Seek, SeekFrom, Write};
 use std::iter;
+
+use serde::Serialize;
+
+use super::database::DbResult;
 
 pub struct Page<const ROW_SIZE: usize> {
     data: Vec<u8>,
@@ -40,5 +44,19 @@ impl<const ROW_SIZE: usize> Page<ROW_SIZE> {
         };
 
         Self { data, free }
+    }
+
+    pub fn insert<S: Serialize>(&mut self, row: S) -> DbResult<()> {
+        let serialized = bitcode::serialize(&row)?;
+        let size = (serialized.len() as u64).to_be_bytes();
+
+        let mut cursor = Cursor::new(&mut self.data);
+        cursor.seek(SeekFrom::Start((PAGE_SIZE - self.free) as u64))?;
+
+        self.free -= cursor.write(&size)?;
+        self.free -= cursor.write(&serialized)?;
+        self.free -= cursor.write(&vec![0; ROW_SIZE - (serialized.len() + size.len())])?;
+
+        Ok(())
     }
 }
