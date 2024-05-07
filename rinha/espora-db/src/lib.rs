@@ -1,2 +1,4 @@
+pub mod error;
+pub mod lock;
 pub mod model;
-pub mod model;
+mod test;
