@@ -12,6 +12,12 @@ pub struct Page<const ROW_SIZE: usize> {
 
 pub const PAGE_SIZE: usize = 4096;
 
+impl<const ROW_SIZE: usize> AsRef<[u8]> for Page<ROW_SIZE> {
+    fn as_ref(&self) -> &[u8] {
+        &self.data
+    }
+}
+
 impl<const ROW_SIZE: usize> Page<ROW_SIZE> {
     pub fn new() -> Self {
         Self {
