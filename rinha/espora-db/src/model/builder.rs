@@ -12,3 +12,15 @@ impl Default for Builder {
         }
     }
 }
+
+impl Builder {
+    pub fn sync_writes(self, sync_writes: bool) -> Self {
+        Self {
+            sync_writes: if sync_writes {
+                Some(Duration::from_secs(0))
+            } else {
+                None
+            },
+        }
+    }
+}
