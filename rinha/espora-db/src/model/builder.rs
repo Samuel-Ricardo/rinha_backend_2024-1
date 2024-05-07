@@ -23,4 +23,10 @@ impl Builder {
             },
         }
     }
+
+    pub fn sync_write_interval(self, interval: Duration) -> Self {
+        Self {
+            sync_writes: Some(interval),
+        }
+    }
 }
