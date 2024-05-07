@@ -4,6 +4,8 @@ use std::{
     time::{Duration, Instant},
 };
 
+use crate::error::Error;
+
 pub struct Db<T, const ROM_SIZE: usize> {
     //    current_page: Page<ROM_SIZE>,
     reader: File,
@@ -12,3 +14,5 @@ pub struct Db<T, const ROM_SIZE: usize> {
     pub(crate) sync_writes: Option<Duration>,
     data: PhantomData<T>,
 }
+
+pub(crate) type DbResult<T> = Result<T, Error>;
