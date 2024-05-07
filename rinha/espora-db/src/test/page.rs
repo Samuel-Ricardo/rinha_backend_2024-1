@@ -7,7 +7,15 @@ mod test {
         let page = Page::<1024>::new();
 
         assert_eq!(0, page.len());
-        assert_eq!(PAGE_SIZE, page.free_space());
+        assert_eq!(PAGE_SIZE, page.available_space());
+    }
+
+    #[test]
+    fn empty_bytes() {
+        let page = Page::<1024>::from_bytes(vec![]);
+
+        assert_eq!(0, page.len());
+        assert_eq!(PAGE_SIZE, page.available_space());
     }
 
     #[test]
