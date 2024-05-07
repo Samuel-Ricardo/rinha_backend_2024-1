@@ -1,5 +1,6 @@
 use std::{error, fmt, io};
 
+#[derive(Debug)]
 pub enum Error {
     Io(io::Error),
     Serialization(Box<dyn error::Error + Send + Sync>),
@@ -19,5 +20,11 @@ impl std::error::Error for Error {}
 impl From<io::Error> for Error {
     fn from(err: io::Error) -> Self {
         Self::Io(err)
+    }
+}
+
+impl From<bitcode::Error> for Error {
+    fn from(err: bitcode::Error) -> Self {
+        Self::Serialization(Box::new(err))
     }
 }
