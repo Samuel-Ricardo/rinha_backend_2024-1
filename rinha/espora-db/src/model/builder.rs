@@ -4,3 +4,11 @@ use std::time::Duration;
 pub struct Builder {
     sync_writes: Option<Duration>,
 }
+
+impl Default for Builder {
+    fn default() -> Self {
+        Builder {
+            sync_writes: Some(Duration::from_secs(0)),
+        }
+    }
+}
