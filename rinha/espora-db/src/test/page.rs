@@ -1,9 +1,17 @@
 #[cfg(test)]
 mod test {
-    use crate::model::page::Page;
+    use crate::model::page::{Page, PAGE_SIZE};
 
     #[test]
-    fn test_insert_into_page() {
+    fn initialize() {
+        let page = Page::<1024>::new();
+
+        assert_eq!(0, page.len());
+        assert_eq!(PAGE_SIZE, page.free_space());
+    }
+
+    #[test]
+    fn insert_into_page() {
         let mut page = Page::<1024>::new();
         assert_eq!(4, page.available_rows());
 
