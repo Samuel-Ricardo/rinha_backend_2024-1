@@ -90,4 +90,12 @@ impl<const ROW_SIZE: usize> Page<ROW_SIZE> {
             Some(&row[8..8 + size])
         })
     }
+
+    pub fn len(&self) -> usize {
+        self.data.len()
+    }
+
+    pub fn available_rows(&self) -> usize {
+        (PAGE_SIZE - self.data.len()) / ROW_SIZE
+    }
 }
