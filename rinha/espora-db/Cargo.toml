@@ -7,4 +7,5 @@ edition = "2021"
 
 [dependencies]
 bitcode = { version = "0.6.0", features = ["serde"] }
+libc = { version = "0.2.154", default-features = false }
 serde = { version = "1.0.200", features = ["derive"] }
