@@ -98,4 +98,8 @@ impl<const ROW_SIZE: usize> Page<ROW_SIZE> {
     pub fn available_rows(&self) -> usize {
         (PAGE_SIZE - self.data.len()) / ROW_SIZE
     }
+
+    pub fn available_space(&self) -> usize {
+        self.free
+    }
 }
