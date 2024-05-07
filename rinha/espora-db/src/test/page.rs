@@ -1,6 +1,9 @@
 #[cfg(test)]
 mod test {
-    use crate::model::page::{Page, PAGE_SIZE};
+    use crate::{
+        model::page::{Page, PAGE_SIZE},
+        test,
+    };
 
     #[test]
     fn initialize() {
@@ -63,6 +66,37 @@ mod test {
             bitcode::deserialize::<u64>(&rows.next().unwrap()).unwrap()
         );
 
+        assert!(rows.next().is_none());
+    }
+
+    #[test]
+    fn update_existing_page() {
+        let mut page = Page::<1024>::from_bytes(vec![]);
+        page.insert("Rinha").unwrap();
+        page.insert("De").unwrap();
+
+        let mut page = Page::<1024>::from_bytes(page.as_ref().to_vec());
+        page.insert("Backend").unwrap();
+        page.insert("2024").unwrap();
+
+        let mut rows = page.rows();
+
+        assert_eq!(
+            "Rinha",
+            bitcode::deserialize::<String>(&rows.next().unwrap()).unwrap()
+        );
+        assert_eq!(
+            "De",
+            bitcode::deserialize::<String>(&rows.next().unwrap()).unwrap()
+        );
+        assert_eq!(
+            "Backend",
+            bitcode::deserialize::<String>(&rows.next().unwrap()).unwrap()
+        );
+        assert_eq!(
+            "2024",
+            bitcode::deserialize::<String>(&rows.next().unwrap()).unwrap()
+        );
         assert!(rows.next().is_none());
     }
 }
