@@ -59,4 +59,29 @@ impl<const ROW_SIZE: usize> Page<ROW_SIZE> {
 
         Ok(())
     }
+
+    pub fn rows(&self) -> impl Iterator<Item = &[u8]> {
+        let mut cursor = 0;
+
+        iter::from_fn(move || {
+            let offset = cursor * ROW_SIZE;
+            if offset + ROW_SIZE > self.data.len() {
+                return None;
+            }
+
+            let row = &self.data[offset..offset + ROW_SIZE];
+            let size = {
+                let mut buf = [0; 8];
+                buf.copy_from_slice(&row[0..8]);
+                u64::from_be_bytes(buf) as usize
+            };
+
+            if size == 0 {
+                return None;
+            }
+
+            cursor += 1;
+            Some(&row[8..8 + size])
+        })
+    }
 }
