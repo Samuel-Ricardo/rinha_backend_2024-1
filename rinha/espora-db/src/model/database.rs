@@ -1,12 +1,15 @@
 use std::{
-    fs::File,
+    fs::{File, OpenOptions},
+    io::{self, Read, Seek},
     marker::PhantomData,
+    os::windows::fs::FileExt,
+    path::Path,
     time::{Duration, Instant},
 };
 
 use serde::{de::DeserializeOwned, Deserialize, Serialize};
 
-use crate::error::Error;
+use crate::{error::Error, model::page::PAGE_SIZE};
 
 use super::{builder::Builder, page::Page};
 
@@ -24,5 +27,34 @@ pub(crate) type DbResult<T> = Result<T, Error>;
 impl<const ROW_SIZE: usize, T: Serialize + DeserializeOwned> Db<T, ROW_SIZE> {
     pub fn builder() -> Builder {
         Builder::default()
+    }
+
+    pub fn from_path(path: impl AsRef<Path>) -> io::Result<Self> {
+        let mut file = OpenOptions::new()
+            .read(true)
+            .write(true)
+            .create(true)
+            .open(&path)?;
+
+        let current_page = if file.seek(io::SeekFrom::End(-(PAGE_SIZE as i64))).is_ok() {
+            let mut buf = vec![0; PAGE_SIZE];
+
+            file.read_exact(&mut buf)?;
+            file.seek(io::SeekFrom::End(-(PAGE_SIZE as i64)))?;
+
+            Page::from_bytes(buf)
+        } else {
+            file.seek(io::SeekFrom::End(0))?;
+            Page::new()
+        };
+
+        Ok(Self {
+            current_page,
+            reader: File::open(&path)?,
+            writer: file,
+            last_sync: Instant::now(),
+            sync_writes: Some(Duration::from_secs(0)),
+            data: PhantomData,
+        })
     }
 }
