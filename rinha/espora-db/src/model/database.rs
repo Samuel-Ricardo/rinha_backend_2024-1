@@ -1,6 +1,7 @@
 use std::{
     fs::{File, OpenOptions},
     io::{self, Read, Seek, Write},
+    iter,
     marker::PhantomData,
     os::windows::{fs::FileExt, io::AsRawHandle},
     path::Path,
@@ -95,5 +96,25 @@ impl<const ROW_SIZE: usize, T: Serialize + DeserializeOwned> Db<T, ROW_SIZE> {
             }),
             _ => Err(io::Error::new(io::ErrorKind::Other, "Could not lock file").into()),
         }
+    }
+
+    pub fn pages(&mut self) -> impl Iterator<Item = Page<ROW_SIZE>> + '_ {
+        let mut cursor = 0;
+
+        iter::from_fn(move || {
+            let offset = (cursor * PAGE_SIZE) as u64;
+
+            if self.reader.seek(io::SeekFrom::Start(offset)).is_err() {
+                return None;
+            }
+
+            let mut buf = vec![0; PAGE_SIZE];
+            cursor += 1;
+
+            match self.reader.read_exact(&mut buf) {
+                Ok(()) => Some(Page::from_bytes(buf)),
+                Err(_) => None,
+            }
+        })
     }
 }
