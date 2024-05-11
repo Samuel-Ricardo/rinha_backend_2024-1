@@ -117,4 +117,23 @@ impl<const ROW_SIZE: usize, T: Serialize + DeserializeOwned> Db<T, ROW_SIZE> {
             }
         })
     }
+
+    pub fn pages_reverse(&mut self) -> impl Iterator<Item = Page<ROW_SIZE>> + '_ {
+        let mut cursor = 1;
+        iter::from_fn(move || {
+            let offset = (cursor * PAGE_SIZE) as i64;
+
+            if self.reader.seek(io::SeekFrom::End(-offset)).is_err() {
+                return None;
+            }
+
+            let mut buf = vec![0; PAGE_SIZE];
+            cursor += 1;
+
+            match self.reader.read_exact(&mut buf) {
+                Ok(()) => Some(Page::from_bytes(buf)),
+                Err(_) => None,
+            }
+        })
+    }
 }
