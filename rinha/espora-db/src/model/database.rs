@@ -144,4 +144,14 @@ impl<const ROW_SIZE: usize, T: Serialize + DeserializeOwned> Db<T, ROW_SIZE> {
                 .collect::<Vec<_>>()
         })
     }
+
+    pub fn rows_reverse(&mut self) -> impl Iterator<Item = DbResult<T>> + '_ {
+        self.pages_reverse().flat_map(|page| {
+            page.rows()
+                .map(|row| bitcode::deserialize(row).map_err(|err| err.into()))
+                .collect::<Vec<_>>()
+                .into_iter()
+                .rev()
+        })
+    }
 }
