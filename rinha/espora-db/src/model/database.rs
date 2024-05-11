@@ -2,14 +2,15 @@ use std::{
     fs::{File, OpenOptions},
     io::{self, Read, Seek, Write},
     marker::PhantomData,
-    os::windows::fs::FileExt,
+    os::windows::{fs::FileExt, io::AsRawHandle},
     path::Path,
     time::{Duration, Instant},
 };
 
 use serde::{de::DeserializeOwned, Deserialize, Serialize};
+use winapi::um::{fileapi::LockFile, minwinbase::LOCKFILE_EXCLUSIVE_LOCK};
 
-use crate::{error::Error, model::page::PAGE_SIZE};
+use crate::{error::Error, lock::LockHandle, model::page::PAGE_SIZE};
 
 use super::{builder::Builder, page::Page};
 
@@ -84,5 +85,15 @@ impl<const ROW_SIZE: usize, T: Serialize + DeserializeOwned> Db<T, ROW_SIZE> {
         }
 
         Ok(())
+    }
+
+    pub fn lock_writes(&mut self) -> DbResult<LockHandle> {
+        let fd = self.writer.as_raw_handle() as *mut winapi::ctypes::c_void;
+        match unsafe { LockFile(fd, 0, 0, 1, 0) } {
+            0 => Ok(LockHandle {
+                fd: fd as *mut std::ffi::c_void,
+            }),
+            _ => Err(io::Error::new(io::ErrorKind::Other, "Could not lock file").into()),
+        }
     }
 }
