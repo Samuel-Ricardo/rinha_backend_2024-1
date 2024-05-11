@@ -33,4 +33,13 @@ impl Builder {
             sync_writes: Some(interval),
         }
     }
+
+    pub fn build<T: Serialize + DeserializeOwned, const ROM_SIZE: usize>(
+        self,
+        path: impl AsRef<Path>,
+    ) -> io::Result<Db<T, ROM_SIZE>> {
+        let mut db = Db::from_path(path)?;
+        db.sync_writes = self.sync_writes;
+        Ok(db)
+    }
 }
