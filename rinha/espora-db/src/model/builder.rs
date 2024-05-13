@@ -42,4 +42,12 @@ impl Builder {
         db.sync_writes = self.sync_writes;
         Ok(db)
     }
+    /* TODO: TOKIO ASYNC DB
+    #[cfg(feature = "tokio")]
+    pub async fn build_tokio<T: Serialize + DeserializeOwned, const ROM_SIZE: usize>(
+        self,
+        path: impl AsRef<Path>,
+    ) -> io::Result<Db<T, ROM_SIZE>> {
+    }
+    */
 }
