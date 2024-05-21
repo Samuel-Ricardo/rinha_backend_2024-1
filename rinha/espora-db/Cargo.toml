@@ -7,6 +7,7 @@ edition = "2021"
 
 [dependencies]
 bitcode = { version = "0.6.0", features = ["serde"] }
+futures = { version = "0.3.30", optional = true, default-features = false, features = ["std"] }
 libc = { version = "0.2.154", default-features = false }
 serde = { version = "1.0.200", features = ["derive"] }
 tokio = { version = "1.37.0", features = [
@@ -17,3 +18,6 @@ tokio = { version = "1.37.0", features = [
   "sync",
 ] }
 winapi = { version = "0.3.9", features = ["synchapi", "fileapi"] }
+
+[features]
+futures = ["dep:futures"]
