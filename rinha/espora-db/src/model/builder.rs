@@ -6,7 +6,7 @@ use super::database::Db;
 
 #[derive(Debug)]
 pub struct Builder {
-    sync_writes: Option<Duration>,
+    pub(crate) sync_writes: Option<Duration>,
 }
 
 impl Default for Builder {
