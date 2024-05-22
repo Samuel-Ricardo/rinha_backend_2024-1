@@ -154,7 +154,7 @@ impl<const ROW_SIZE: usize, T: Serialize + DeserializeOwned> Db<T, ROW_SIZE> {
         })
     }
 
-    pub fn rows_reverse(&mut self) -> impl Stream<Item = DbResult<t>> + '_ {
+    pub fn rows_reverse(&mut self) -> impl Stream<Item = DbResult<T>> + '_ {
         self.pages_reverse().flat_map(|page| {
             stream::iter(
                 page.rows()
