@@ -144,12 +144,24 @@ impl<const ROW_SIZE: usize, T: Serialize + DeserializeOwned> Db<T, ROW_SIZE> {
         }
     }
 
-    pub fn rows(&mut self) -> impl Stream<Item = DbResult<t>> + '_ {
+    pub fn rows(&mut self) -> impl Stream<Item = DbResult<T>> + '_ {
         self.pages().flat_map(|page| {
             stream::iter(
                 page.rows()
-                    .map(|row| bitcode::deserialize(row).map_err(|err| err, into()))
+                    .map(|row| bitcode::deserialize(row).map_err(|err| err.into()))
                     .collect::<Vec<_>>(),
+            )
+        })
+    }
+
+    pub fn rows_reverse(&mut self) -> impl Stream<Item = DbResult<t>> + '_ {
+        self.pages_reverse().flat_map(|page| {
+            stream::iter(
+                page.rows()
+                    .map(|row| bitcode::deserialize(row).map_err(|err| err.into()))
+                    .collect::<Vec<_>>()
+                    .into_iter()
+                    .rev(),
             )
         })
     }
