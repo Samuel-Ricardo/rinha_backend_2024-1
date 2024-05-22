@@ -144,6 +144,16 @@ impl<const ROW_SIZE: usize, T: Serialize + DeserializeOwned> Db<T, ROW_SIZE> {
         }
     }
 
+    pub fn rows(&mut self) -> impl Stream<Item = DbResult<t>> + '_ {
+        self.pages().flat_map(|page| {
+            stream::iter(
+                page.rows()
+                    .map(|row| bitcode::deserialize(row).map_err(|err| err, into()))
+                    .collect::<Vec<_>>(),
+            )
+        })
+    }
+
     //TODO: REFACT ALL TO LIBC
 
     pub async fn lock_writes(&mut self) -> DbResult<LockHandle> {
