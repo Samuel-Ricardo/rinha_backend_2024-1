@@ -122,6 +122,28 @@ impl<const ROW_SIZE: usize, T: Serialize + DeserializeOwned> Db<T, ROW_SIZE> {
         }
     }
 
+    fn pages_reverse(&mut self) -> impl Stream<Item = Page<ROW_SIZE>> + '_ {
+        let mut cursor = 1;
+
+        stream! {
+            loop {
+                let offset = (cursor * PAGE_SIZE) as u64;
+
+                if self.reader.seek(io::SeekFrom::End(-offset)).await.is_err() {
+                    break;
+                }
+
+                let mut buf = vec![0; PAGE_SIZE];
+                cursor += 1;
+
+                match self.reader.read_exact(&mut buf).await {
+                    Ok(n) if n > 0 => yield Page::<ROW_SIZE>::from_bytes(buf),
+                    _ => break,
+                }
+            }
+        }
+    }
+
     //TODO: REFACT ALL TO LIBC
 
     pub async fn lock_writes(&mut self) -> DbResult<LockHandle> {
